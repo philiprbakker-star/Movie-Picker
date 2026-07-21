@@ -13,8 +13,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col font-sans">
+    <html lang="en">
+      <body>
         <main className="max-w-3xl w-full mx-auto px-4 py-8">
           <NavTabs />
           {children}
