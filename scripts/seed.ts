@@ -1,116 +1,60 @@
 import { getDb, upsertTitle, recordScrapeRun } from "../lib/db";
 
 // Sample data so the UI (filters, top-10, suggestions) can be exercised
-// before the real scrape pipeline is run. These are REAL, well-known 2025
-// releases (not invented placeholders), spread across all 5 platforms.
-// imdbId/posterUrl are left null because we don't have a verified-working
-// OMDb key to confirm exact ids/poster URLs — a wrong id/link would be
-// worse than none. Ratings/runtimes are best-effort approximations; run
-// `npm run scrape` with a valid OMDB_API_KEY to replace these with
-// OMDb-verified values (including real poster images).
+// before the real scrape pipeline is run. These are REAL 2025 releases,
+// all with an IMDb rating of 7.0+ (per user requirement), spread across
+// all 5 platforms — platform counts are uneven on purpose, since real
+// per-platform quality/quantity isn't equal either. imdbId/posterUrl are
+// left null: no verified-working OMDb key yet to confirm exact ids/poster
+// URLs, and a wrong id/link would be worse than none. Ratings/runtimes are
+// best-effort approximations; run `npm run scrape` with a valid
+// OMDB_API_KEY to replace these with OMDb-verified values.
 const SEED_TITLES = [
   // Netflix
   {
     imdbId: null,
-    title: "The Electric State",
+    title: "Frankenstein",
     type: "movie" as const,
     year: 2025,
-    genres: ["Action", "Adventure", "Sci-Fi"],
-    runtimeMinutes: 128,
-    imdbRating: 5.3,
-    plot: "In a retro-futuristic world, an orphaned teen and her robot cross the country to find her long-lost brother.",
+    genres: ["Drama", "Horror", "Sci-Fi"],
+    runtimeMinutes: 149,
+    imdbRating: 7.5,
+    plot: "Guillermo del Toro's retelling of Mary Shelley's story of a scientist and the creature he brings to life.",
     posterUrl: null,
-    releasedDate: "2025-03-14",
+    releasedDate: "2025-11-07",
     addedToPlatformDate: "2026-07-01",
     platforms: ["netflix" as const],
   },
   {
     imdbId: null,
-    title: "Havoc",
+    title: "K-Pop Demon Hunters",
     type: "movie" as const,
     year: 2025,
-    genres: ["Action", "Crime", "Thriller"],
-    runtimeMinutes: 105,
-    imdbRating: 6.4,
-    plot: "A detective fights his way through a criminal underworld to save a politician's son.",
+    genres: ["Animation", "Action", "Comedy", "Fantasy", "Musical"],
+    runtimeMinutes: 96,
+    imdbRating: 7.8,
+    plot: "A K-pop girl group secretly moonlights as demon hunters protecting their fans from supernatural threats.",
     posterUrl: null,
-    releasedDate: "2025-04-25",
+    releasedDate: "2025-06-20",
     addedToPlatformDate: "2026-07-03",
     platforms: ["netflix" as const],
-  },
-  // Prime Video
-  {
-    imdbId: null,
-    title: "G20",
-    type: "movie" as const,
-    year: 2025,
-    genres: ["Action", "Thriller"],
-    runtimeMinutes: 110,
-    imdbRating: 6.0,
-    plot: "The US president must protect her family and fellow world leaders when the G20 summit is taken hostage.",
-    posterUrl: null,
-    releasedDate: "2025-04-10",
-    addedToPlatformDate: "2026-07-05",
-    platforms: ["prime_video" as const],
-  },
-  {
-    imdbId: null,
-    title: "Deep Cover",
-    type: "movie" as const,
-    year: 2025,
-    genres: ["Action", "Comedy", "Crime"],
-    runtimeMinutes: 100,
-    imdbRating: 6.3,
-    plot: "An improv teacher and her students are recruited by police for an undercover sting that spirals out of control.",
-    posterUrl: null,
-    releasedDate: "2025-06-12",
-    addedToPlatformDate: "2026-07-08",
-    platforms: ["prime_video" as const],
   },
   // Disney+
   {
     imdbId: null,
-    title: "Captain America: Brave New World",
+    title: "Thunderbolts*",
     type: "movie" as const,
     year: 2025,
     genres: ["Action", "Adventure", "Sci-Fi"],
-    runtimeMinutes: 118,
-    imdbRating: 6.0,
-    plot: "Sam Wilson steps up as the new Captain America and gets caught in an international incident.",
+    runtimeMinutes: 127,
+    imdbRating: 7.6,
+    plot: "A group of antiheroes and former villains are thrown together on a dangerous mission.",
     posterUrl: null,
-    releasedDate: "2025-02-14",
+    releasedDate: "2025-05-02",
     addedToPlatformDate: "2026-07-02",
     platforms: ["disney_plus" as const],
   },
-  {
-    imdbId: null,
-    title: "Snow White",
-    type: "movie" as const,
-    year: 2025,
-    genres: ["Adventure", "Family", "Fantasy"],
-    runtimeMinutes: 109,
-    imdbRating: 4.5,
-    plot: "A live-action retelling of the classic tale of a princess, seven dwarfs and a wicked queen.",
-    posterUrl: null,
-    releasedDate: "2025-03-21",
-    addedToPlatformDate: "2026-07-10",
-    platforms: ["disney_plus" as const],
-  },
   // HBO Max
-  {
-    imdbId: null,
-    title: "Mickey 17",
-    type: "movie" as const,
-    year: 2025,
-    genres: ["Comedy", "Sci-Fi"],
-    runtimeMinutes: 137,
-    imdbRating: 7.0,
-    plot: "An expendable employee on a space colony is reprinted with a new body each time he dies, until things go wrong.",
-    posterUrl: null,
-    releasedDate: "2025-03-07",
-    addedToPlatformDate: "2026-07-04",
-    platforms: ["hbo_max" as const],
-  },
   {
     imdbId: null,
     title: "Sinners",
@@ -122,7 +66,49 @@ const SEED_TITLES = [
     plot: "Twin brothers return to their Mississippi hometown to start over, only to find that evil has followed them.",
     posterUrl: null,
     releasedDate: "2025-04-18",
+    addedToPlatformDate: "2026-07-04",
+    platforms: ["hbo_max" as const],
+  },
+  {
+    imdbId: null,
+    title: "Mickey 17",
+    type: "movie" as const,
+    year: 2025,
+    genres: ["Comedy", "Sci-Fi"],
+    runtimeMinutes: 137,
+    imdbRating: 7.0,
+    plot: "An expendable employee on a space colony is reprinted with a new body each time he dies, until things go wrong.",
+    posterUrl: null,
+    releasedDate: "2025-03-07",
     addedToPlatformDate: "2026-07-06",
+    platforms: ["hbo_max" as const],
+  },
+  {
+    imdbId: null,
+    title: "One Battle After Another",
+    type: "movie" as const,
+    year: 2025,
+    genres: ["Action", "Comedy", "Drama"],
+    runtimeMinutes: 162,
+    imdbRating: 8.0,
+    plot: "A former revolutionary must resurface after years in hiding when an old enemy re-enters his life.",
+    posterUrl: null,
+    releasedDate: "2025-09-26",
+    addedToPlatformDate: "2026-07-08",
+    platforms: ["hbo_max" as const],
+  },
+  {
+    imdbId: null,
+    title: "Weapons",
+    type: "movie" as const,
+    year: 2025,
+    genres: ["Horror", "Mystery"],
+    runtimeMinutes: 128,
+    imdbRating: 7.5,
+    plot: "When almost all the children from one class vanish without a trace on the same night, a community is torn apart.",
+    posterUrl: null,
+    releasedDate: "2025-08-08",
+    addedToPlatformDate: "2026-07-10",
     platforms: ["hbo_max" as const],
   },
   // Videoland
@@ -152,6 +138,20 @@ const SEED_TITLES = [
     posterUrl: null,
     releasedDate: "2025-06-13",
     addedToPlatformDate: "2026-07-11",
+    platforms: ["videoland" as const],
+  },
+  {
+    imdbId: null,
+    title: "Bugonia",
+    type: "movie" as const,
+    year: 2025,
+    genres: ["Comedy", "Drama", "Sci-Fi"],
+    runtimeMinutes: 118,
+    imdbRating: 7.3,
+    plot: "Two conspiracy-obsessed men kidnap a corporate CEO they believe to be an alien.",
+    posterUrl: null,
+    releasedDate: "2025-10-24",
+    addedToPlatformDate: "2026-07-12",
     platforms: ["videoland" as const],
   },
   // --- Series ---
@@ -199,15 +199,15 @@ const SEED_TITLES = [
   },
   {
     imdbId: null,
-    title: "The Bondsman",
+    title: "Fallout",
     type: "series" as const,
     year: 2025,
-    genres: ["Action", "Comedy", "Fantasy"],
-    runtimeMinutes: 45,
-    imdbRating: 6.5,
-    plot: "A bounty hunter is resurrected from hell to hunt demons that have escaped alongside him.",
+    genres: ["Action", "Adventure", "Drama"],
+    runtimeMinutes: 60,
+    imdbRating: 8.0,
+    plot: "Season two: in a world destroyed by nuclear war, survivors emerge from underground vaults to face new threats.",
     posterUrl: null,
-    releasedDate: "2025-03-13",
+    releasedDate: "2025-12-17",
     addedToPlatformDate: "2026-07-08",
     platforms: ["prime_video" as const],
   },
@@ -269,6 +269,20 @@ const SEED_TITLES = [
   },
   {
     imdbId: null,
+    title: "Task",
+    type: "series" as const,
+    year: 2025,
+    genres: ["Crime", "Drama", "Thriller"],
+    runtimeMinutes: 55,
+    imdbRating: 7.8,
+    plot: "An FBI agent leads a task force investigating a string of home-invasion robberies with a surprising connection.",
+    posterUrl: null,
+    releasedDate: "2025-09-07",
+    addedToPlatformDate: "2026-07-09",
+    platforms: ["hbo_max" as const],
+  },
+  {
+    imdbId: null,
     title: "Poker Face",
     type: "series" as const,
     year: 2025,
@@ -281,20 +295,6 @@ const SEED_TITLES = [
     addedToPlatformDate: "2026-07-10",
     platforms: ["videoland" as const],
   },
-  {
-    imdbId: null,
-    title: "Suits LA",
-    type: "series" as const,
-    year: 2025,
-    genres: ["Drama"],
-    runtimeMinutes: 45,
-    imdbRating: 6.0,
-    plot: "A former New York prosecutor rebuilds his career at a cutthroat Los Angeles law firm.",
-    posterUrl: null,
-    releasedDate: "2025-02-23",
-    addedToPlatformDate: "2026-07-12",
-    platforms: ["videoland" as const],
-  },
 ];
 
 function main() {
@@ -305,7 +305,7 @@ function main() {
   for (const t of SEED_TITLES) {
     upsertTitle(t);
   }
-  recordScrapeRun("success", SEED_TITLES.length, "seed data (2025 titles)");
+  recordScrapeRun("success", SEED_TITLES.length, "seed data (2025 titles, 7.0+ rating)");
   console.log(`Seeded ${SEED_TITLES.length} titles.`);
 }
 
