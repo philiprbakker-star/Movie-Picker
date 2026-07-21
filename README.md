@@ -1,38 +1,38 @@
 # Movie Picker
 
-Lokale webapp die per maand de best beoordeelde films en series toont op HBO
-Max, Videoland, Netflix, Prime Video en Disney+ (NL), met filters op
-platform, genre en lengte — plus een Suggesties-tab die op basis van een
-korte quiz AI-suggesties geeft (Claude API).
+A local web app that shows the best-rated movies and series of the past
+month on HBO Max, Videoland, Netflix, Prime Video and Disney+ (NL), with
+filters on platform, genre and length — plus a Suggestions tab that gives
+AI-powered suggestions (Claude API) based on a short quiz.
 
 ## Tabs
-- **Films** — top 10 films van de afgelopen maand, gesorteerd op IMDb-score.
-- **Series** — zelfde, voor series.
-- **Suggesties** — beantwoord een paar vragen (stemming, genre, tijd, met wie)
-  en krijg gerichte suggesties uit de huidige catalogus.
+- **Movies** — top 10 movies of the past month, sorted by IMDb rating.
+- **Series** — same, for series.
+- **Suggestions** — answer a few questions (mood, genre, time, who you're
+  watching with) and get targeted suggestions from the current catalog.
 
-## Databron
-- **OMDb API** — IMDb-score, genre, lengte, releasedatum per titel (gratis
-  key nodig, zie `.env.local.example`).
-- **JustWatch NL** — scraping van publieke, per-platform "nieuw" pagina's om
-  te bepalen wat waar staat. Fragiel per ontwerp: als JustWatch hun markup
-  wijzigt, levert de scrape 0 resultaten en blijft de bestaande cache staan
-  in plaats van leeggemaakt te worden.
+## Data source
+- **OMDb API** — IMDb rating, genre, runtime, release date per title (free
+  API key required, see `.env.local.example`).
+- **JustWatch NL** — scraping of public, per-platform "new" listing pages to
+  determine what's available where. Fragile by design: if JustWatch changes
+  their markup, the scrape returns 0 results and the existing cache is left
+  untouched instead of being wiped.
 
-Data wordt lokaal gecached in `data/movies.db` (SQLite via Node's ingebouwde
-`node:sqlite`) en alleen ververst via `npm run scrape`, niet bij elke
-paginabezoek.
+Data is cached locally in `data/movies.db` (SQLite via Node's built-in
+`node:sqlite`) and only refreshed via `npm run scrape`, not on every page
+load.
 
 ## Setup
-1. Kopieer `.env.local.example` naar `.env.local` en vul in:
-   - `OMDB_API_KEY` — gratis via https://www.omdbapi.com/apikey.aspx
+1. Copy `.env.local.example` to `.env.local` and fill in:
+   - `OMDB_API_KEY` — free, via https://www.omdbapi.com/apikey.aspx
    - `ANTHROPIC_API_KEY` — via https://console.anthropic.com
 2. `npm install`
-3. `npm run seed` (voorbeelddata) of `npm run scrape` (echte data ophalen)
-4. `npm run dev` en open http://localhost:3000
+3. `npm run seed` (sample data) or `npm run scrape` (fetch real data)
+4. `npm run dev` and open http://localhost:3000
 
 ## Scripts
-- `npm run dev` — lokale dev-server
-- `npm run scrape` — scrape JustWatch NL + verrijk met OMDb, schrijf naar SQLite
-- `npm run seed` — vult de database met een handjevol voorbeeldtitels (geen API-keys nodig)
-- `npm run build` / `npm run start` — productie-build/-start
+- `npm run dev` — local dev server
+- `npm run scrape` — scrape JustWatch NL + enrich with OMDb, write to SQLite
+- `npm run seed` — populates the database with a handful of sample titles (no API keys needed)
+- `npm run build` / `npm run start` — production build/start

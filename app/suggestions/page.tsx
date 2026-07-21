@@ -3,10 +3,10 @@
 import { useState } from "react";
 import type { Suggestion, SuggestionRequest } from "@/lib/types";
 
-const MOODS = ["Ontspannen", "Spannend", "Grappig", "Ontroerend", "Actievol"];
-const GENRES = ["Geen voorkeur", "Actie", "Comedy", "Drama", "Sci-Fi", "Thriller", "Documentaire"];
-const TIMES = ["< 30 min", "30-60 min", "1-2 uur", "2+ uur"];
-const WITH = ["Alleen", "Partner", "Vrienden", "Familie / kinderen"];
+const MOODS = ["Relaxed", "Suspenseful", "Funny", "Emotional", "Action-packed"];
+const GENRES = ["No preference", "Action", "Comedy", "Drama", "Sci-Fi", "Thriller", "Documentary"];
+const TIMES = ["< 30 min", "30-60 min", "1-2 hours", "2+ hours"];
+const WITH = ["Alone", "Partner", "Friends", "Family / kids"];
 
 export default function SuggestionsPage() {
   const [answers, setAnswers] = useState<SuggestionRequest>({
@@ -30,10 +30,10 @@ export default function SuggestionsPage() {
         body: JSON.stringify(answers),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Onbekende fout");
+      if (!res.ok) throw new Error(data.error ?? "Unknown error");
       setSuggestions(data.suggestions);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Onbekende fout");
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
     }
@@ -70,28 +70,28 @@ export default function SuggestionsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Wat zullen we kijken?</h1>
+      <h1 className="text-2xl font-bold mb-4">What should we watch?</h1>
       <div className="grid gap-4 max-w-md mb-6">
         <Select
-          label="Wat voor stemming?"
+          label="What's the mood?"
           value={answers.mood}
           options={MOODS}
           onChange={(v) => setAnswers({ ...answers, mood: v })}
         />
         <Select
-          label="Genre-voorkeur?"
+          label="Genre preference?"
           value={answers.genrePreference}
           options={GENRES}
           onChange={(v) => setAnswers({ ...answers, genrePreference: v })}
         />
         <Select
-          label="Hoeveel tijd heb je?"
+          label="How much time do you have?"
           value={answers.timeAvailable}
           options={TIMES}
           onChange={(v) => setAnswers({ ...answers, timeAvailable: v })}
         />
         <Select
-          label="Met wie kijk je?"
+          label="Who are you watching with?"
           value={answers.watchingWith}
           options={WITH}
           onChange={(v) => setAnswers({ ...answers, watchingWith: v })}
@@ -101,7 +101,7 @@ export default function SuggestionsPage() {
           disabled={loading}
           className="bg-blue-600 text-white rounded px-4 py-2 text-sm font-medium disabled:opacity-50"
         >
-          {loading ? "Bezig..." : "Geef me suggesties"}
+          {loading ? "Loading..." : "Get suggestions"}
         </button>
       </div>
 

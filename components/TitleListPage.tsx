@@ -39,10 +39,10 @@ export function TitleListPage({ type, heading }: { type: TitleType; heading: str
       <h1 className="text-2xl font-bold mb-4">{heading}</h1>
       <FilterBar filters={filters} onChange={setFilters} platforms={platforms} genres={genres} />
       {loading ? (
-        <p className="text-neutral-500">Laden...</p>
+        <p className="text-neutral-500">Loading...</p>
       ) : titles.length === 0 ? (
         <p className="text-neutral-500">
-          Geen titels gevonden. Draai eerst <code>npm run scrape</code> om de catalogus te vullen.
+          No titles found. Run <code>npm run scrape</code> first to populate the catalog.
         </p>
       ) : (
         <div className="grid gap-3">

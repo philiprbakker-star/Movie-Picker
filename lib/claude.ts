@@ -45,21 +45,21 @@ export async function getSuggestions(
     model: "claude-opus-4-8",
     max_tokens: 1024,
     system:
-      "Je bent een Nederlandse streaming-aanbevelingsassistent. Je kiest ALLEEN titels uit de meegegeven catalogus " +
-      "(niet daarbuiten) en geeft per suggestie een korte, concrete reden die aansluit bij de antwoorden van de gebruiker.",
+      "You are a streaming recommendation assistant. You choose ONLY titles from the given catalog " +
+      "(never anything outside it) and give a short, concrete reason per suggestion that matches the user's answers.",
     tools: [SUGGESTIONS_TOOL],
     tool_choice: { type: "tool", name: "provide_suggestions" },
     messages: [
       {
         role: "user",
         content:
-          `Beschikbare catalogus:\n${catalogToPrompt(catalog)}\n\n` +
-          `Mijn voorkeuren:\n` +
-          `- Stemming: ${request.mood}\n` +
+          `Available catalog:\n${catalogToPrompt(catalog)}\n\n` +
+          `My preferences:\n` +
+          `- Mood: ${request.mood}\n` +
           `- Genre: ${request.genrePreference}\n` +
-          `- Beschikbare tijd: ${request.timeAvailable}\n` +
-          `- Kijken met: ${request.watchingWith}\n\n` +
-          `Geef 3 tot 5 suggesties uit de catalogus hierboven.`,
+          `- Time available: ${request.timeAvailable}\n` +
+          `- Watching with: ${request.watchingWith}\n\n` +
+          `Give 3 to 5 suggestions from the catalog above.`,
       },
     ],
   });

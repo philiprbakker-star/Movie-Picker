@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
 
   if (catalog.length === 0) {
     return NextResponse.json(
-      { error: "Geen catalogus beschikbaar. Draai eerst de scrape-pipeline." },
+      { error: "No catalog available. Run the scrape pipeline first." },
       { status: 400 }
     );
   }
@@ -27,6 +27,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ suggestions });
   } catch (err) {
     console.error("Claude suggestion error:", err);
-    return NextResponse.json({ error: "Suggesties ophalen mislukt." }, { status: 500 });
+    return NextResponse.json({ error: "Failed to get suggestions." }, { status: 500 });
   }
 }
