@@ -19,9 +19,22 @@ AI-powered suggestions (Claude API) based on a short quiz.
   their markup, the scrape returns 0 results and the existing cache is left
   untouched instead of being wiped.
 
-Data is cached locally in `data/movies.db` (SQLite via Node's built-in
+Data is cached in `data/movies.db` (SQLite via Node's built-in
 `node:sqlite`) and only refreshed via `npm run scrape`, not on every page
-load.
+load. This file IS committed to the repo — it's the deployed catalog
+snapshot, not a build artifact (see "Deploying" below).
+
+## Updating the deployed catalog
+Serverless hosts (e.g. Vercel) have a read-only deployment filesystem, so
+the app can't scrape/write at request time in production. The workflow is:
+1. Locally, run `npm run scrape` (or `npm run seed`) — this updates
+   `data/movies.db` on disk.
+2. Commit and push `data/movies.db`.
+3. Redeploy (Vercel redeploys automatically on push to `main`).
+
+On Vercel, `lib/db.ts` detects the `VERCEL` env var and copies the bundled
+`data/movies.db` into the writable `/tmp` dir on cold start rather than
+opening it in place.
 
 ## Setup
 1. Copy `.env.local.example` to `.env.local` and fill in:

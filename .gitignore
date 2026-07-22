@@ -34,8 +34,11 @@ yarn-error.log*
 .env*
 !.env.local.example
 
-# local sqlite database (scraped/seed data, not source)
-/data/*.db
+# sqlite journal/lock files only — data/movies.db itself IS committed,
+# it's the deployed catalog snapshot (see README "Updating the deployed catalog")
+/data/*.db-journal
+/data/*.db-wal
+/data/*.db-shm
 
 # vercel
 .vercel

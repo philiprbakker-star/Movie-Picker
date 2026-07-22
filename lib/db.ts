@@ -1,14 +1,33 @@
 import { DatabaseSync } from "node:sqlite";
+import fs from "node:fs";
 import path from "node:path";
+import os from "node:os";
 import type { Platform, Title, TitleFilters, TitleType } from "./types";
 
-const DB_PATH = path.join(process.cwd(), "data", "movies.db");
+const BUNDLED_DB_PATH = path.join(process.cwd(), "data", "movies.db");
+
+// Serverless platforms (Vercel, etc.) ship the deployment as a read-only
+// filesystem — the bundled db can be read but not written/journaled in
+// place. Copy it to the writable tmp dir once per cold start and use that
+// as the working copy. Locally (no VERCEL env var) we read/write the
+// bundled file directly so `npm run scrape`/`npm run seed` persist.
+function resolveDbPath(): string {
+  if (!process.env.VERCEL) return BUNDLED_DB_PATH;
+
+  const tmpDbPath = path.join(os.tmpdir(), "movies.db");
+  if (!fs.existsSync(tmpDbPath)) {
+    if (fs.existsSync(BUNDLED_DB_PATH)) {
+      fs.copyFileSync(BUNDLED_DB_PATH, tmpDbPath);
+    }
+  }
+  return tmpDbPath;
+}
 
 let db: DatabaseSync | null = null;
 
 export function getDb(): DatabaseSync {
   if (db) return db;
-  db = new DatabaseSync(DB_PATH);
+  db = new DatabaseSync(resolveDbPath());
   db.exec(`
     CREATE TABLE IF NOT EXISTS titles (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
