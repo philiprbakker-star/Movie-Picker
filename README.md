@@ -42,10 +42,14 @@ opening it in place.
    - `ANTHROPIC_API_KEY` — via https://console.anthropic.com
 2. `npm install`
 3. `npm run seed` (sample data) or `npm run scrape` (fetch real data)
-4. `npm run dev` and open http://localhost:3000
+4. `npm run fetch-posters` (optional) — fills in poster images for the seed
+   titles from Wikipedia's public API (no key needed); real scraped data
+   from OMDb already includes posters, this is only for the seed dataset
+5. `npm run dev` and open http://localhost:3000
 
 ## Scripts
 - `npm run dev` — local dev server
 - `npm run scrape` — scrape JustWatch NL + enrich with OMDb, write to SQLite
 - `npm run seed` — populates the database with a handful of sample titles (no API keys needed)
+- `npm run fetch-posters` — backfills poster images for the seed titles via Wikipedia (no key needed)
 - `npm run build` / `npm run start` — production build/start
