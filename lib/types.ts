@@ -39,11 +39,14 @@ export interface Title {
   platforms: Platform[];
 }
 
+export type SortBy = "rating" | "year" | "runtime";
+
 export interface TitleFilters {
   type: TitleType;
-  platform?: Platform;
-  genre?: string;
+  platforms?: Platform[];
+  genres?: string[];
   maxRuntime?: number;
+  sortBy?: SortBy;
   limit?: number;
 }
 

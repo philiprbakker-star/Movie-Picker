@@ -15,10 +15,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <main className="max-w-3xl w-full mx-auto px-4 py-8">
-          <NavTabs />
-          {children}
-        </main>
+        <NavTabs />
+        <main className="w-full px-4 sm:px-8 py-8">{children}</main>
       </body>
     </html>
   );

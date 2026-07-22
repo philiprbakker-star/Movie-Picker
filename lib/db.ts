@@ -93,20 +93,26 @@ export function getTitles(filters: TitleFilters): Title[] {
   `;
   const params: (string | number)[] = [filters.type];
 
-  if (filters.platform) {
-    query += ` AND tp.platform = ?`;
-    params.push(filters.platform);
+  if (filters.platforms && filters.platforms.length > 0) {
+    query += ` AND tp.platform IN (${filters.platforms.map(() => "?").join(",")})`;
+    params.push(...filters.platforms);
   }
-  if (filters.genre) {
-    query += ` AND t.genres LIKE ?`;
-    params.push(`%${filters.genre}%`);
+  if (filters.genres && filters.genres.length > 0) {
+    query += ` AND (${filters.genres.map(() => `t.genres LIKE ?`).join(" OR ")})`;
+    params.push(...filters.genres.map((g) => `%${g}%`));
   }
   if (filters.maxRuntime) {
     query += ` AND (t.runtime_minutes IS NULL OR t.runtime_minutes <= ?)`;
     params.push(filters.maxRuntime);
   }
 
-  query += ` ORDER BY t.imdb_rating DESC LIMIT ?`;
+  const sortColumn =
+    filters.sortBy === "year"
+      ? "t.year"
+      : filters.sortBy === "runtime"
+        ? "t.runtime_minutes"
+        : "t.imdb_rating";
+  query += ` ORDER BY ${sortColumn} DESC LIMIT ?`;
   params.push(limit);
 
   const rows = database.prepare(query).all(...params) as Record<string, unknown>[];
