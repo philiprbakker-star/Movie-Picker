@@ -49,17 +49,3 @@ export interface TitleFilters {
   sortBy?: SortBy;
   limit?: number;
 }
-
-export interface SuggestionRequest {
-  mood: string;
-  genrePreference: string;
-  timeAvailable: string;
-  watchingWith: string;
-}
-
-export interface Suggestion {
-  title: string;
-  type: TitleType;
-  platform: string;
-  reason: string;
-}
